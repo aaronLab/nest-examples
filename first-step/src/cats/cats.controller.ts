@@ -1,8 +1,8 @@
 import {
+  Body,
   Controller,
   Get,
   Header,
-  HttpCode,
   Param,
   Post,
   Query,
@@ -10,12 +10,15 @@ import {
   Req,
 } from '@nestjs/common';
 import { Request } from 'express';
+import { Observable, of } from 'rxjs';
+import { CreateCatDto } from './dto/create-cat.dto';
 
 @Controller('cats')
 export class CatsController {
   @Post()
   @Header('Cache-Control', 'none')
-  create(): string {
+  async create(@Body() createCatDto: CreateCatDto) {
+    console.log(createCatDto);
     return 'This action adds a new cat.';
   }
 
@@ -28,9 +31,9 @@ export class CatsController {
   }
 
   @Get()
-  findAll(@Req() request: Request): string {
+  findAll(@Req() request: Request): Observable<any[]> {
     console.log(request);
-    return 'This action returns all cats';
+    return of([]);
   }
 
   @Get('ab*cd')
