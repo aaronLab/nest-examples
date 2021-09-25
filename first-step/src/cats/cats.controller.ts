@@ -1,48 +1,54 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
-  Header,
+  HttpStatus,
   Param,
   Post,
+  Put,
   Query,
-  Redirect,
-  Req,
+  Res,
 } from '@nestjs/common';
-import { Request } from 'express';
-import { Observable, of } from 'rxjs';
+import { Response } from 'express';
 import { CreateCatDto } from './dto/create-cat.dto';
+import { ListAllEntities } from './dto/list-all-entities.dto';
+import { UpdateCatDto } from './dto/update-cat.dto';
 
 @Controller('cats')
 export class CatsController {
   @Post()
-  @Header('Cache-Control', 'none')
-  async create(@Body() createCatDto: CreateCatDto) {
-    console.log(createCatDto);
-    return 'This action adds a new cat.';
-  }
-
-  @Get('docs')
-  @Redirect('http://aaronlab.net', 302)
-  getDocs(@Query('version') version) {
-    if (version && version === '5') {
-      return { url: 'https://github.com/aaronLab' };
-    }
+  create(
+    @Body() createCatDto: CreateCatDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    res.status(HttpStatus.CREATED);
+    return createCatDto;
   }
 
   @Get()
-  findAll(@Req() request: Request): Observable<any[]> {
-    console.log(request);
-    return of([]);
-  }
-
-  @Get('ab*cd')
-  wildCard(): string {
-    return 'This route uses a wildcard';
+  findAll(
+    @Query() query: ListAllEntities,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    res.status(HttpStatus.OK);
+    return [query];
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): string {
-    return `This action returns a #${id}`;
+  findOne(@Param('id') id: string) {
+    return `This action returns a #${id} cat`;
+  }
+
+  @Put(':id')
+  update(@Param('id') id: string, @Body() updateCatDto: UpdateCatDto) {
+    console.log(`id: ${id}`);
+    console.log(updateCatDto);
+    return `This action updates a #${id} cat`;
+  }
+
+  @Delete(':id')
+  delete(@Param('id') id: string) {
+    return `This action removes a #${id} cat`;
   }
 }
